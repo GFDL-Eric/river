@@ -1,0 +1,21 @@
+#!/bin/tcsh
+
+setenv LD_LIBRARY_PATH ${old_LD_LIBRARY_PATH}
+
+unalias gcp
+unalias gmake
+
+unset old_LD_LIBRARY_PATH
+unset FMS_incdir
+unset FMS_libdir
+unset FMS_dir
+unset out_dir
+unset exec_dir
+unset src_dir
+unset run_dir
+unset compile_dir
+unset river_dir
+unset river_network_ext_file
+unset glcc_file
+unset mosaic
+unset echo

@@ -1,0 +1,7 @@
+source run.setup $1
+source run.simple_hydrog
+source run.addlake simple_hydrog 1
+source run.mod_river_network_lake_only
+source run.addlake mod_rv_pp 2
+source run.slope_fields
+source run.finalize

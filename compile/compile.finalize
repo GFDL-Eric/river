@@ -1,0 +1,12 @@
+#!/bin/tcsh
+setenv LD_LIBRARY_PATH ${old_LD_LIBRARY_PATH}
+unalias gmake
+unset old_LD_LIBRARY_PATH
+unset FMS_incdir
+unset FMS_libdir
+unset FMS_dir
+unset river_dir
+unset compile_dir
+unset src_dir
+unset exec_dir
+unset comp_template

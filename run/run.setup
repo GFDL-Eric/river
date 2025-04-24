@@ -1,0 +1,37 @@
+#!/bin/tcsh
+
+#wipeftmp
+
+set echo
+#set mosaic = cm6
+set mosaic = cm5
+#set mosaic = cm4
+#set mosaic = cm4_aja
+
+# Archive files
+set river_network_ext_file = /archive/kap/lmdt/river_network/netcdf/0.5deg/disagg/river_network_mrg_0.5deg_ad3nov_fill_coast_auto2_0.125.nc
+#set river_network_ext_file = /archive/kap/lmdt/river_network/netcdf/0.5deg/disagg/river_network_mrg_0.5deg_ad3nov_0.125.nc
+set glcc_file = /archive/pcm/land_data/cover_lad/gigbp2_0ll.nc
+
+# Paths
+set river_dir = /work/Eric.Stofferahn/river
+set compile_dir = ${river_dir}/compile
+set run_dir = ${river_dir}/run
+set src_dir = ${river_dir}/src
+set exec_dir = ${river_dir}/exec
+set out_dir = ${run_dir}/output/${mosaic}/$1
+
+set FMS_dir = /work/Eric.Stofferahn/WUT_nompi
+set FMS_libdir = ${FMS_dir}/lib
+set FMS_incdir = ${FMS_dir}/include
+
+set old_LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${FMS_libdir}
+
+# Load modules
+source ${river_dir}/river_module_load
+
+# Make output directory
+mkdir -p ${out_dir}
+
+alias gcp 'gcp -v --sync'

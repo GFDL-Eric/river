@@ -1,0 +1,37 @@
+#!/bin/tcsh
+set rmvp_input_files = $1
+set rmvp_exec_path = $2
+set rmvp_out_dir = $3
+
+mkdir -p scratch
+cd scratch
+
+echo $#rmvp_input_files > fort.5
+foreach file ($rmvp_input_files)
+   gcp $file .
+   echo $file:t >> fort.5
+end
+echo $add_ocean_const >> fort.5
+echo ""
+echo REMOVE PARALLEL RIVERS
+unset echo
+
+cat fort.5
+
+${rmvp_exec_path}/rmvp < fort.5
+set echo
+
+if ($status != 0) then
+    echo ERROR in removal of parallel rivers, exiting...
+    exit
+else
+    mv *.nc fort.* out.* ${rmvp_out_dir}/
+endif
+
+
+cd ../
+rm -rf scratch
+
+unset rmvp_out_dir
+unset rmvp_exec_path
+unset rmvp_input_files

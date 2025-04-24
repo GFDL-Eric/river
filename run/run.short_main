@@ -1,0 +1,3 @@
+source run.setup $1
+source run.just_regrid
+source run.finalize

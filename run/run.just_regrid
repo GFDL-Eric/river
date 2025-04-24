@@ -1,0 +1,46 @@
+#!/bin/tcsh
+
+set current_stage = simple_hydrog
+set read_land_mask = 1
+set min_frac = 0.
+set land_thresh = 1.e-5
+set mosaic_path = ${river_dir}/${mosaic}_mosaic
+set mosaic_file = ${mosaic_path}/grid_spec.nc
+
+mkdir -p ${out_dir}/${current_stage}
+
+cd $TMPDIR
+
+mkdir -p exec
+mkdir -p output/{river_regrid,post_regrid,rmv_parallel_rivers,post_rmvp}
+mkdir -p data
+
+gcp ${exec_dir}/simple_hydrog/cp_rvar_tmp $TMPDIR/exec/
+gcp ${exec_dir}/simple_hydrog/rmvp    $TMPDIR/exec/
+gcp ${exec_dir}/simple_hydrog/cplf    $TMPDIR/exec/
+chmod ugo+x $TMPDIR/exec/cp_rvar_tmp $TMPDIR/exec/rmvp $TMPDIR/exec/cplf
+
+dmget $river_network_ext_file
+
+
+# ------------------------------------------------
+#  RUN RIVER_REGRID
+# ------------------------------------------------
+echo ""
+echo RUN RIVER-REGRID
+if ($read_land_mask == 0) then
+   river_regrid --mosaic $mosaic_file --river_src $river_network_ext_file --min_frac $min_frac --land_thresh $land_thresh
+else
+   river_regrid --mosaic $mosaic_file --river_src $river_network_ext_file --min_frac $min_frac --land_thresh $land_thresh --read_land_mask
+endif
+mv * output/river_regrid/
+
+unset mosaic_file
+unset mosaic_path
+unset current_stage
+unset read_land_mask
+unset min_frac
+unset land_thresh
+unset add_ocean_const
+unset travel_thresh
+unset hydro_files

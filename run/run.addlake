@@ -1,0 +1,157 @@
+#!/bin/tcsh
+set previous_stage = ${1}
+set current_stage = biglake${2}
+set cap_lake_depth = T
+set interp_elev = T
+set interp_res = 1.   # set to 1., 0.5, or 0.25
+set npts_lake_mod = 0
+set elev_res = 30   # use "30" for 30 arc-second GTOPO30 data
+set glcc_file = /archive/pcm/land_data/cover_lad/gigbp2_0ll.nc
+set river_files = ${out_dir}/${previous_stage}/river_network.tile?.nc
+set lakes_input_file =  /home/kap/lmdt/mod_input_files/input/input.insert_lakes_C96.18mar13
+set caspian_input_file =  /home/kap/lmdt/mod_input_files/input/input.casp_grid_cells_C96.18mar13
+set gage_file = /home/kap/basin_anal/tables.gage_locations/table.gage_locs.c96_cm4.29apr2015
+set read_lake_frac = T
+set read_gage_data = T
+set cnct_next_all_outlet0 = T
+set interp_glcc_to_1deg = T
+set cap_lake_depth = T
+set travel_thresh = 2.
+set interp_elev = T
+set interp_res = 1.
+
+mkdir -p ${out_dir}/${current_stage}
+
+cd $TMPDIR
+
+gcp ${exec_dir}/lake/addlakes $TMPDIR/exec/
+gcp ${exec_dir}/lake/cpel $TMPDIR/exec/
+
+mkdir -p lake_tmp
+cd lake_tmp
+
+echo "integer, parameter :: ntiles= $#river_files" > param.h
+
+dmget $glcc_file
+
+gcp gfdl:$glcc_file $TMPDIR/data/
+gcp gfdl:$river_files  .
+
+gcp gfdl:$lakes_input_file   fort.20
+gcp gfdl:$caspian_input_file fort.21
+gcp gfdl:$gage_file fort.23
+
+
+rm -f fort.24
+foreach file ($river_files)
+   echo $file >> fort.24
+end
+echo $read_lake_frac >> fort.24
+echo $cnct_next_all_outlet0 >> fort.24
+echo $interp_glcc_to_1deg >> fort.24
+echo $read_gage_data >> fort.24
+echo $cap_lake_depth >> fort.24
+echo $travel_thresh >> fort.24
+echo $TMPDIR/data/$glcc_file:t >> fort.24
+echo $npts_lake_mod >> fort.24
+if ($npts_lake_mod > 0) then
+    @ k = 0
+    while ($k < $npts_lake_mod) 
+       @ k = $k + 1
+       echo $nl_mod[$k] $jl_mod[$k] $il_mod[$k] $lfr_mod[$k] >> fort.24
+    end
+endif
+    
+
+cat fort.24
+
+touch input.nml
+${TMPDIR}/exec/addlakes < fort.24
+
+foreach file ($river_files)
+   set tn = `echo "$file" | awk -Ftile '{print $2}'`
+     ncks -A --no-abc -v lake_frac,lake_depth_sill,lake_tau,WaterBod,PWetland,connected_to_next,whole_lake_area,igageloc,jgageloc,bname_gage \
+     lake_frac.tile"$tn" "$file:t"
+end
+
+# NOW ADD ELEVATION DATA
+
+echo "integer, parameter :: ntiles= $#river_files" > param.h
+echo "integer, parameter :: ide= 43200, jde= 21600" >> param.h
+echo "real, parameter :: rese= 1./120." >> param.h
+set elev_file = /archive/kap/relief/gtopo30_2may2011/netcdf/gtopo30.nc
+
+if ($interp_res == 1.) then
+    echo "integer, parameter :: ido= 360, jdo= 180" >> param.h
+    echo "integer, parameter :: ncell_cnv= 120" >> param.h
+    echo "real, parameter :: reso= 1." >> param.h
+else if ($interp_res == 0.5) then
+    echo "integer, parameter :: ido= 720, jdo= 360" >> param.h
+    echo "integer, parameter :: ncell_cnv= 60" >> param.h
+    echo "real, parameter :: reso= 0.5" >> param.h
+else if ($interp_res == 0.25) then
+    echo "integer, parameter :: ido= 1440, jdo= 720" >> param.h
+    echo "integer, parameter :: ncell_cnv= 30" >> param.h
+    echo "real, parameter :: reso= 0.25" >> param.h
+else if ($interp_res == 0.125) then
+    echo "integer, parameter :: ido= 2880, jdo= 1440" >> param.h
+    echo "integer, parameter :: ncell_cnv= 15" >> param.h
+    echo "real, parameter :: reso= 0.125" >> param.h
+else
+    echo ERROR: invalid interpolation resolution
+    echo ...exiting...
+    exit
+endif
+
+dmget $elev_file
+
+gcp gfdl:$elev_file $TMPDIR/data/
+ln -s $TMPDIR/data/$elev_file:t .
+
+rm -f fort.5
+echo $elev_res > fort.5
+foreach file ($river_files)
+   echo $file:t >> fort.5
+end
+echo $interp_elev >> fort.5
+echo $interp_res >> fort.5
+
+time $TMPDIR/exec/cpel < fort.5
+
+foreach file ($river_files)
+   set tn = `echo "$file" | awk -Ftile '{print $2}'`
+   ncks -A --no-abc -v elev,elev_sd,elev_min,elev_max elev.tile"$tn" "$file:t"
+end
+
+cp elev* ${out_dir}/${current_stage}/
+cp fort* ${out_dir}/${current_stage}/
+cp lake_frac* ${out_dir}/${current_stage}/
+cp out* ${out_dir}/${current_stage}/
+cp param.h ${out_dir}/${current_stage}/
+cp river_network* ${out_dir}/${current_stage}/
+
+cd $TMPDIR
+
+cd ${run_dir}
+
+unset previous_stage
+unset current_stage
+unset cap_lake_depth
+unset interp_elev
+unset interp_res
+unset npts_lake_mod
+unset elev_res
+unset glcc_file
+unset river_files
+unset lakes_input_file
+unset caspian_input_file
+unset gage_file
+unset read_lake_frac
+unset read_gage_data
+unset cnct_next_all_outlet0
+unset interp_glcc_to_1deg
+unset cap_lake_depth
+unset travel_thresh
+unset interp_elev
+unset interp_res
+unset elev_file

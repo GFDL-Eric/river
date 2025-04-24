@@ -1,0 +1,15 @@
+#!/bin/tcsh
+set river_dir = /work/Eric.Stofferahn/river
+set compile_dir = ${river_dir}/compile
+set src_dir = ${river_dir}/src
+set exec_dir = ${river_dir}/exec
+set comp_template = ${compile_dir}/river_comp_template
+
+set FMS_dir = /work/Eric.Stofferahn/WUT_nompi
+set FMS_libdir = ${FMS_dir}/lib
+set FMS_incdir = ${FMS_dir}/include
+
+set old_LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${FMS_libdir}
+
+source ${river_dir}/river_module_load

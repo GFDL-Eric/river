@@ -1,0 +1,93 @@
+#!/bin/tcsh
+
+set current_stage = simple_hydrog
+set read_land_mask = 1
+set min_frac = 0.
+set land_thresh = 1.e-5
+set mosaic_path = ${river_dir}/${mosaic}_mosaic
+set mosaic_file = ${mosaic_path}/grid_spec.nc
+
+mkdir -p ${out_dir}/${current_stage}
+
+cd $TMPDIR
+
+mkdir -p exec
+mkdir -p output/{river_regrid,post_regrid,rmv_parallel_rivers,post_rmvp}
+mkdir -p data
+
+gcp ${exec_dir}/simple_hydrog/cp_rvar_tmp $TMPDIR/exec/
+gcp ${exec_dir}/simple_hydrog/rmvp    $TMPDIR/exec/
+gcp ${exec_dir}/simple_hydrog/cplf    $TMPDIR/exec/
+chmod ugo+x $TMPDIR/exec/cp_rvar_tmp $TMPDIR/exec/rmvp $TMPDIR/exec/cplf
+
+dmget $river_network_ext_file
+
+
+# ------------------------------------------------
+#  RUN RIVER_REGRID
+# ------------------------------------------------
+echo ""
+echo RUN RIVER-REGRID
+if ($read_land_mask == 0) then
+   river_regrid --mosaic $mosaic_file --river_src $river_network_ext_file --min_frac $min_frac --land_thresh $land_thresh
+else
+   river_regrid --mosaic $mosaic_file --river_src $river_network_ext_file --min_frac $min_frac --land_thresh $land_thresh --read_land_mask
+endif
+mv river_output*nc output/river_regrid/
+
+
+# ------------------------------------------------
+#  POST-PROCESS output FROM RIVER_REGRID
+# ------------------------------------------------
+
+source ${run_dir}/run.pp $TMPDIR/'output/river_regrid/river_output*nc' $TMPDIR/exec $TMPDIR/output/post_regrid
+
+# ------------------------------------------------
+#  REMOVE PARALLEL RIVERS
+# ------------------------------------------------
+
+set add_ocean_const = F
+
+source ${run_dir}/run.rm_parallel_rivers $TMPDIR/'output/post_regrid/river_network*nc' $TMPDIR/exec $TMPDIR/output/rmv_parallel_rivers
+
+# ------------------------------------------------
+#  POST-PROCESS output FROM REMOVE-PARALLEL-RIVERS
+# ------------------------------------------------
+
+source ${run_dir}/run.pp $TMPDIR/'output/rmv_parallel_rivers/river_network*nc' $TMPDIR/exec $TMPDIR/output/post_rmvp
+
+# --------------------------------------
+#  ADD GLCC WATERBOD data
+# --------------------------------------
+
+set travel_thresh = 2.
+
+dmget $glcc_file
+gcp gfdl:$glcc_file   gfdl:$TMPDIR/data/
+
+source ${run_dir}/run.glcc $TMPDIR/'output/post_rmvp/river_network*nc' $TMPDIR/exec 
+
+gcp output/post_rmvp/river_network.tile*.nc $TMPDIR/
+set hydro_files = $TMPDIR/river_network.tile*.nc
+foreach file ($hydro_files)
+   set tn = `echo "$file" | awk -Ftile '{print $2}'`
+   ncks -A --no-alpha -v lake_frac,lake_depth_sill,lake_tau,WaterBod,PWetland,connected_to_next,whole_lake_area,max_slope_to_next \
+     lake_frac.tile"$tn" "$file:t"
+end
+
+cp *.nc ${out_dir}/${current_stage}/
+cp -R output/* ${out_dir}/${current_stage}/
+
+#cd ${out_dir}/${current_stage}
+#rename hydrography river_network *.nc
+cd ${run_dir}
+
+unset mosaic_file
+unset mosaic_path
+unset current_stage
+unset read_land_mask
+unset min_frac
+unset land_thresh
+unset add_ocean_const
+unset travel_thresh
+unset hydro_files

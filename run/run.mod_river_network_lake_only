@@ -1,0 +1,47 @@
+#!/bin/tcsh
+
+set previous_stage = biglake1
+set current_stage = mod_river_network
+set pp_stage = mod_rv_pp
+set river_input_file = ${out_dir}/${previous_stage}/river_network.tile?.nc
+set lake_mod_file =  ${river_dir}/data/lake_zigzag
+set read_caspian_network = F
+
+mkdir -p ${out_dir}/${current_stage}
+mkdir -p ${out_dir}/${pp_stage}
+
+cd $TMPDIR
+
+gcp ${exec_dir}/river_network/mod_rv_net $TMPDIR/exec/
+
+mkdir -p mod_river_temp
+cd mod_river_temp
+
+gcp $lake_mod_file fort.21
+
+wc -l fort.21 | awk '{print $1}' > fort.5
+echo $#river_input_file >> fort.5
+foreach file ($river_input_file)
+   gcp $file .
+   echo $file:t >> fort.5
+end
+echo $read_caspian_network >> fort.5
+    
+cat fort.5
+
+time $TMPDIR/exec/mod_rv_net < fort.5
+
+mv *.nc fort.* out.* ${out_dir}/${current_stage}/
+
+cd $TMPDIR
+
+source ${run_dir}/run.pp ${out_dir}/${current_stage}/'river_network_mod*nc' $TMPDIR/exec ${out_dir}/${pp_stage}/
+
+cd ${run_dir}
+
+unset read_caspian_network
+unset lake_mod_file
+unset river_input_file
+unset pp_stage
+unset current_stage
+unset previous_stage

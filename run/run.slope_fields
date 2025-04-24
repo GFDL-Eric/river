@@ -1,0 +1,60 @@
+#!/bin/tcsh
+set previous_stage = biglake2
+set current_stage = slope_fields
+set modify_elev_min = T
+set use_input_elev_file = F
+set river_input_files = ${out_dir}/${previous_stage}/river_network.tile?.nc
+set modify_elev_min = T
+set nmod_elev_min = (    2    3    3    3    5 )
+set imod_elev_min = (   85   53   41   18   13 )
+set jmod_elev_min = (   85   20   21   11   57 )
+set val_elev_min =  (   20.  34.  12.   6.  29.)
+
+mkdir -p ${out_dir}/${current_stage}
+
+cd $TMPDIR
+
+gcp ${exec_dir}/river_network/slope_fields $TMPDIR/exec/
+
+mkdir -p slope_fields_temp
+cd slope_fields_temp
+
+echo $#river_input_files > fort.5
+foreach file ($river_input_files)
+   echo $file:t >> fort.5
+end
+
+gcp -v gfdl:$river_input_files  .
+
+echo T >> fort.5
+echo $#nmod_elev_min >> fort.5
+echo $nmod_elev_min >> fort.5
+echo $imod_elev_min >> fort.5
+echo $jmod_elev_min >> fort.5
+echo $val_elev_min >> fort.5
+
+cat fort.5
+
+time $TMPDIR/exec/slope_fields < fort.5
+
+foreach file ($river_input_files)
+   set tn = `echo "$file" | awk -Ftile '{print $2}'`
+   ncks -A --no-abc -v elev_min,slope_to_next,slope_to_ocean,max_slope_to_next,max_slope_to_ocean river_network_sf.tile"$tn" "$file:t"
+end
+
+mv *.nc fort.* out.* ${out_dir}/${current_stage}/
+
+cd $TMPDIR
+
+cd ${run_dir}
+
+unset previous_stage
+unset current_stage
+unset modify_elev_min
+unset use_input_elev_file
+unset river_input_files
+unset modify_elev_min
+unset nmod_elev_min
+unset imod_elev_min
+unset jmod_elev_min
+unset val_elev_min

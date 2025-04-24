@@ -1,0 +1,3 @@
+set postp_code_path  = ${src_dir}/simple_hydrog/cp_river_vars.f90
+set rmvpr_code_path  = ${src_dir}/simple_hydrog/rmv_parallel_rivers.f90
+set lakes_code_path  = ${src_dir}/simple_hydrog/cr_lake_files.f90
