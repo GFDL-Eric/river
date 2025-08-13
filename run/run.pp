@@ -14,8 +14,9 @@ end
 echo ""
 echo RUN POST-PROCESSOR
 cat fort.5
-${pp_exec_path}/cp_rvar_tmp < fort.5
-#cp_river_vars < fort.5
+#${pp_exec_path}/cp_rvar_tmp < fort.5
+#${pp_exec_path}/cp_rvar < fort.5
+cp_river_vars < fort.5
 
 if ($status != 0) then
     echo ERROR in post-processing, exiting...

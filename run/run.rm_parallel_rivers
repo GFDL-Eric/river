@@ -18,7 +18,8 @@ unset echo
 
 cat fort.5
 
-${rmvp_exec_path}/rmvp < fort.5
+#${rmvp_exec_path}/rmvp < fort.5
+rmv_parallel_rivers < fort.5
 set echo
 
 if ($status != 0) then

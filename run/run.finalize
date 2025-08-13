@@ -18,4 +18,5 @@ unset river_dir
 unset river_network_ext_file
 unset glcc_file
 unset mosaic
+module rm fre-nctools
 unset echo

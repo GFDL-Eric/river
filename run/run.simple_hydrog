@@ -15,10 +15,13 @@ mkdir -p exec
 mkdir -p output/{river_regrid,post_regrid,rmv_parallel_rivers,post_rmvp}
 mkdir -p data
 
-gcp ${exec_dir}/simple_hydrog/cp_rvar_tmp $TMPDIR/exec/
-gcp ${exec_dir}/simple_hydrog/rmvp    $TMPDIR/exec/
+#gcp ${exec_dir}/simple_hydrog/cp_rvar_tmp $TMPDIR/exec/
+#gcp ${exec_dir}/simple_hydrog/cp_rvar $TMPDIR/exec/
+#gcp ${exec_dir}/simple_hydrog/rmvp    $TMPDIR/exec/
 gcp ${exec_dir}/simple_hydrog/cplf    $TMPDIR/exec/
-chmod ugo+x $TMPDIR/exec/cp_rvar_tmp $TMPDIR/exec/rmvp $TMPDIR/exec/cplf
+#chmod ugo+x $TMPDIR/exec/cp_rvar_tmp $TMPDIR/exec/rmvp $TMPDIR/exec/cplf
+#chmod ugo+x $TMPDIR/exec/cp_rvar $TMPDIR/exec/rmvp $TMPDIR/exec/cplf
+chmod ugo+x $TMPDIR/exec/cplf
 
 dmget $river_network_ext_file
 

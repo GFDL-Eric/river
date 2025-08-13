@@ -1,9 +1,6 @@
-CPPFLAGS = `nf-config --fflags`
-FFLAGS = $(CPPFLAGS) -fltconsistency -fno-alias -stack-temps -safe-cray-ptr -ftz -assume byterecl -g -O2 -i4 -r8 -nowarn -Wp,-w
-FC = ifort
-LD = ifort
-LDFLAGS = `nf-config --flibs` `nc-config --libs`
-CFLAGS = -D__IFC
+FFLAGS = $(CPPFLAGS) $(FCFLAGS) -fcray-pointer -fdefault-real-8 -fdefault-double-8 -Waliasing -ffree-line-length-none -fno-range-check -fallow-argument-mismatch -O2 -fno-expensive-optimizations
+FC = gfortran
+LD = gfortran
 
 #---------------------------------------------------------------------------
 # you should never need to change any lines below.

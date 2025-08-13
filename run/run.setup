@@ -21,7 +21,7 @@ set src_dir = ${river_dir}/src
 set exec_dir = ${river_dir}/exec
 set out_dir = ${run_dir}/output/${mosaic}/$1
 
-set FMS_dir = /work/Eric.Stofferahn/WUT_nompi
+set FMS_dir = /home/Eric.Stofferahn/repos/compiled_FMS_conda
 set FMS_libdir = ${FMS_dir}/lib
 set FMS_incdir = ${FMS_dir}/include
 
@@ -29,7 +29,9 @@ set old_LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}
 setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${FMS_libdir}
 
 # Load modules
-source ${river_dir}/river_module_load
+#source ${river_dir}/river_module_load
+module load gcp
+module load fre-nctools
 
 # Make output directory
 mkdir -p ${out_dir}
