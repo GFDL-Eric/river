@@ -1,4 +1,4 @@
-#Environment on PPAN
+# Environment on PPAN
 The system install of netcdf was not working for me, so I created a conda environment to load netcdf, gcc, and gfortran. This entailed the following:
 
 ```
@@ -10,14 +10,14 @@ mamba install netcdf-fortran gfortran gcc
 
 These steps should allow you to have the environment that will compile and install FMS (a prerequisite to run this code) as well as the executables contained in the src directory in this repository.
 
-#Installation
+# Installation
 
-##FMS
+## FMS
 
-###Use my installation (not guaranteed to work)
+### Use my installation (not guaranteed to work)
 You MIGHT be able to get away with using my installation of FMS located here: /home/Eric.Stofferahn/repos/compiled\_FMS\_conda
 
-###Install your own
+### Install your own
 
 Set some environmental flags:
 
@@ -40,7 +40,7 @@ make install
 
 Make a note of your \<path\_to\_fms\_installation\> as you will need it to install the river executables
 
-##River Executables
+## River Executables
 
 This repo should already contain the executables in the `exec` subdirectory, but if they don't or you need to rebuild with new netcdf versions (or a new FMS installation), here's how that should work:
 
@@ -52,7 +52,7 @@ bash compile.main
 That should recompile the source code in the `src` subdirectory and prompt you to overwrite the executables that are in the `exec` subdirectory (press `y` to overwrite).
 You can also navigate to the source directories to make changes to either the Makefile or source .f90 files, but proceed with extreme caution.
 
-#Running the Code
+# Running the Code
 
 This repository takes a provided grid\_spec, several input data files, and produces 6 river\_network hydrography files in netcdf format (1 per cubed sphere tile).
 To accomplish this, there are several scripts in the `run` subdirectory that utilize both the compiled executables and those found in the fre-nctools package on PPAN.
@@ -83,22 +83,22 @@ Next, you will want to run the program. Ensure the following:
 
 - You are in csh or tcsh (you could try to change the instructions for bash but that is untested)
 - You have the river conda environment enabled
-- You have the appropriate flags loaded with `source ../set\_env\_flags.csh` (this may have been loaded already if you did any installation)
+- You have the appropriate flags loaded with `source ../set_env_flags.csh` (this may have been loaded already if you did any installation)
 
-You're all set... go ahead and do `source run.main <test\_name>` where <test\_name> is a unique identifier (I usually use test\_MMDDYY for today's date)
+You're all set... go ahead and do `source run.main <test_name>` where <test\_name> is a unique identifier (I usually use test\_MMDDYY for today's date)
 This shouldn't have a permanent impact on your environmental variables (there's a lot of setting and unsetting of variables in the code).
 If that's a big concern you can always start a new tcsh shell even if you are already in tcsh.
 
-#Analyzing output
+# Analyzing output
 
-Your output will be in the `run/output/<my\_grid>/<test\_name>` directory. The final output of river\_network hydrography files should be in the `slope\_fields/` subdirectory of that output, and intermediate files should be in the other subdirectories.
+Your output will be in the `run/output/<my_grid>/<test_name>` directory. The final output of river\_network hydrography files should be in the `slope_fields/` subdirectory of that output, and intermediate files should be in the other subdirectories.
 If you'd like to know how a specific test output compares to another one on the same grid (e.g. if you changed an executable or one of the input files), you can use the `compare_output` command in the main repository directory.
 You can compare between two of your own runs, or if you'd like to compare to a reference output, the current hydrography files for ESM4.5 are available here: /work/ejs/river/run/output/cm5/esm45noij
 
-##Final Notes
+## Final Notes
 
 You can tar up the river\_network files to use in a model, but you have to rename them to river\_data.tile?.nc first.
 
 This repo has only really been tested with the c96 "lake\_zigzag" data file. It is possible that other files could work.
-The files aren't easy to find, but here is a potential sample for a 3km grid: `/home/kap/lmdt/river\_network/input/dat.mod\_river\_network.C3072\_c3072\_cm4.lake\_flow.28oct2015.9`
+The files aren't easy to find, but here is a potential sample for a 3km grid: `/home/kap/lmdt/river_network/input/dat.mod_river_network.C3072_c3072_cm4.lake_flow.28oct2015.9`
 Other files in that directory may also help depending on your resolution. You can use the following search parameter in vim: `/\d\+\.\?\(\d\+\)\?\s*[A-Za-z]`
