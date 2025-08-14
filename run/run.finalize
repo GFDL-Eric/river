@@ -1,11 +1,15 @@
 #!/bin/tcsh
 
+if ( $?old_LIBRARY_PATH ) then
 setenv LD_LIBRARY_PATH ${old_LD_LIBRARY_PATH}
+unset old_LD_LIBRARY_PATH
+else
+unset LD_LIBRARY_PATH
+endif
 
 unalias gcp
 unalias gmake
 
-unset old_LD_LIBRARY_PATH
 unset FMS_incdir
 unset FMS_libdir
 unset FMS_dir

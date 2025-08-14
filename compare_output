@@ -1,11 +1,12 @@
 #!/bin/bash
 # load fre/bronx-23 or something else to access nccmp
 #module load fre/bronx-23
-REFERENCE_DIR=esm45noij
-TEST_DIR=test_081125
+#REFERENCE_DIR=esm45noij
+REFERENCE_DIR=test_081125
+TEST_DIR=test_081425
 OUT_DIR=slope_fields
 OUT_FILE=river_network
 OUT_TILE=tile3
 MOSAIC=cm5
-
-nccmp -df run/output/${MOSAIC}/${REFERENCE_DIR}/${OUT_DIR}/${OUT_FILE}.${OUT_TILE}.nc run/output/${MOSAIC}/${TEST_DIR}/${OUT_DIR}/${OUT_FILE}.${OUT_TILE}.nc 2>&1 | awk '{print $13-$15}' | sort --unique
+mytolerance=1e-9
+nccmp -dfT ${mytolerance} run/output/${MOSAIC}/${REFERENCE_DIR}/${OUT_DIR}/${OUT_FILE}.${OUT_TILE}.nc run/output/${MOSAIC}/${TEST_DIR}/${OUT_DIR}/${OUT_FILE}.${OUT_TILE}.nc 2>&1 | awk '{print $5, $9, $13, $14, $15, $17, $19}'

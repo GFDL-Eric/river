@@ -1,6 +1,6 @@
 # Makefile created by mkmf 2022.01.00
 
-OTHERFLAGS = -fPIC --shared -c -I/home/Eric.Stofferahn/repos/compiled_FMS_conda/include -L/home/Eric.Stofferahn/repos/compiled_FMS_conda/lib -lFMS $(LDFLAGS) 
+OTHERFLAGS = -fPIC --shared -c -I$(FMS_incdir) -L$(FMS_libdir) -lFMS $(LDFLAGS) 
 
 MK_TEMPLATE = /work/Eric.Stofferahn/river/compile/river_comp_template
 include $(MK_TEMPLATE)
@@ -26,5 +26,5 @@ tags: $(SRC)
 	ctags $(SRC)
 
 addlakes: $(OBJ)
-	$(FC) $(OBJ) -o addlakes -I/home/Eric.Stofferahn/repos/compiled_FMS_conda/include -L/home/Eric.Stofferahn/repos/compiled_FMS_conda/lib -lFMS $(LDFLAGS)
+	$(FC) $(OBJ) -o addlakes -I$(FMS_incdir) -L$(FMS_libdir) -lFMS $(LDFLAGS)
 

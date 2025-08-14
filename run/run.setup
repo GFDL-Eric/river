@@ -25,8 +25,13 @@ set FMS_dir = /home/Eric.Stofferahn/repos/compiled_FMS_conda
 set FMS_libdir = ${FMS_dir}/lib
 set FMS_incdir = ${FMS_dir}/include
 
-set old_LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}
+if ( $?LD_LIBRARY_PATH ) then
+setenv old_LD_LIBRARY_PATH ${LD_LIBRARY_PATH}
 setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${FMS_libdir}
+else
+unset old_LD_LIBRARY_PATH
+setenv LD_LIBRARY_PATH ${FMS_libdir}
+endif
 
 # Load modules
 #source ${river_dir}/river_module_load

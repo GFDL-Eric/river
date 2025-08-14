@@ -1,3 +1,33 @@
-source compile.setup
-source compile.pp
-source compile.finalize
+#!/bin/bash
+# Don't forget to conda activate river!!
+# Edit the path of the FMS install here:
+export FMS_dir=/home/Eric.Stofferahn/repos/compiled_FMS_conda
+
+export river_dir=/work/Eric.Stofferahn/river
+export compile_dir=${river_dir}/compile
+export src_dir=${river_dir}/src
+export exec_dir=${river_dir}/exec
+export comp_template=${compile_dir}/river_comp_template
+
+export FMS_libdir=${FMS_dir}/lib
+export FMS_incdir=${FMS_dir}/include
+
+export CPPFLAGS="-I`nc-config --includedir`"
+export FCFLAGS="-I`nf-config --includedir`"
+export LDFLAGS="`nc-config --libs` `nf-config --flibs`"
+export FC="`which gfortran`"
+if [[ -v LD_LIBRARY_PATH ]];then
+  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${FMS_libdir}
+else
+  export LD_LIBRARY_PATH=${FMS_libdir}
+fi
+for component in $(ls ${src_dir});do
+  for myprog in $(ls ${src_dir}/${component});do
+    cd ${src_dir}/${component}/${myprog}
+    gmake clean
+    gmake -j 8
+    mv -i ${myprog%%_dir} ${exec_dir}/${component}/
+    gmake clean
+  done
+done
+cd ${compile_dir}
