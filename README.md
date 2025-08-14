@@ -8,6 +8,13 @@ conda activate river
 mamba install netcdf-fortran gfortran gcc
 ```
 
+You can also attempt to install using the enclosed environment.yml as follows:
+
+```
+module load miniforge
+mamba env create -n river -f environment.yml
+```
+
 These steps should allow you to have the environment that will compile and install FMS (a prerequisite to run this code) as well as the executables contained in the src directory in this repository.
 
 # Installation
