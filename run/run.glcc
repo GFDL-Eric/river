@@ -15,7 +15,6 @@ touch input.nml
 echo ""
 echo ADD LAKES
 ${glcc_exec_path}/cplf < fort.5
-#cr_lake_files < fort.5
 
 if ($status != 0) then
     echo ERROR in addition of lake data, exiting...
